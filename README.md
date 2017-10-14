@@ -15,7 +15,7 @@ The land areas of [10 biggest parks](https://www.nycgovparks.org/about/faq) in N
 
 The areas of the zip codes are not adjusted in any way. The 1995 (2005) dataset has 20,933 (8735) alive trees in zip code 0 and 896 (176) dead trees in zip code 0. Those trees were excluded from all visualizations that use zip code information.
 
-10,761 trees of unknown status from 1995 are excluded from all of the plots, since it is not known weather those trees are dead or alive.
+10,761 trees of unknown status from 1995 are excluded from all of the plots, since it is not known whether those trees are dead or alive.
 
 There are 9300 unknown alive trees in 1995, 17,505 unknown alive trees in 2005, and 5 unknown alive trees in 2015. They do not appear in the most popular species visualization.
 
