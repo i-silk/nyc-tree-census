@@ -3,6 +3,8 @@
 The code in this repository is for analyzing New York City's tree census data collected in [1995](https://data.cityofnewyork.us/Environment/1995-Street-Tree-Census/kyad-zm4j), [2005](https://data.cityofnewyork.us/Environment/2005-Street-Tree-Census/29bw-z7pj), and [2015](https://data.cityofnewyork.us/Environment/2015-Street-Tree-Census-Tree-Data/uvpi-gqnh). The data is provided by Department of Parks and Recreation (DPR) and owned
 by NYC OpenData. The census has been collected by volunteers and staff of DPR.
 
+All data processed from raw data and used to make the visualizations is stored in processed-data directory.
+
 Areas of zip codes are scraped from [city-data website](http://www.city-data.com/zipmaps/New-York-New-York.html). Areas of the boroughs were found on [Wikipedia](https://en.wikipedia.org/wiki/Boroughs_of_New_York_City).
 
 The analysis examines changes in tree numbers and neighborhood tree densities for both dead and alive trees.

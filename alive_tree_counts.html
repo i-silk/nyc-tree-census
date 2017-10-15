@@ -1,0 +1,123 @@
+<!code adapted from
+http://curran.github.io/screencasts/introToD3/examples/viewer/#/104 and
+https://bl.ocks.org/mbostock/7322386>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Alive Tree Counts</title>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <style>
+      .textbox text {
+        text-anchor: left;
+      }
+
+      .title.textbox {
+        font: 16pt sans-serif;
+      }
+
+      .desc.textbox {
+        font: 12pt sans-serif;
+      }
+
+      .chart rect {
+        fill: teal;
+      }
+      .chart text {
+        fill: white;
+        font: 13pt sans-serif;
+        text-anchor: end;
+      }
+
+      .axis text {
+        font: 14pt sans-serif;
+      }
+      .axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+      .y.axis path, .y.axis line {
+        stroke: none;
+      }
+
+    </style>
+  </head>
+  <body>
+    <script>
+
+      var outerWidth = 500;
+      var outerHeight = 250;
+      var margin = { left: 50, top: 50, right: 0, bottom: 0 };
+      var barPadding = 0.2;
+
+      var xColumn = "counts";
+      var yColumn = "year";
+
+      var innerWidth  = outerWidth  - margin.left - margin.right;
+      var innerHeight = outerHeight - margin.top  - margin.bottom;
+
+      var svg = d3.select("body").append("svg")
+        .attr("width",  outerWidth)
+        .attr("height", outerHeight);
+
+      var textBox = svg.append("g")
+        .attr("class", "textbox");
+      var title = textBox.append("text")
+        .attr("class", "title textbox")
+        .attr("x", 0 )
+        .attr("y", 20)
+        .text("Title of Diagram");
+      var description = textBox.append("text")
+        .attr("class", "desc textbox")
+        .attr("y", 40)
+        .text("Blah")
+
+      var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      var chart = g.append("g")
+        .attr("class", "chart")
+      var yAxisG = g.append("g")
+        .attr("class", "y axis");
+
+      var xScale = d3.scale.linear().range([0, innerWidth]);
+      var yScale = d3.scale.ordinal().rangeBands([0, innerHeight], barPadding);
+
+      var yAxis = d3.svg.axis().scale(yScale).orient("left")
+
+      function render(data){
+
+        xScale.domain([0, d3.max(data, function(d) { return d[xColumn]; })]);
+        yScale.domain(data.map( function(d) { return d[yColumn]; }));
+
+        yAxisG.call(yAxis);
+
+        var bars = chart.selectAll("rect").data(data);
+
+        bars.enter().append("rect")
+          .attr("height", yScale.rangeBand())
+          .attr("x", 0)
+          .attr("y", function(d) { return yScale(d[yColumn]); })
+          .attr("width", function(d) { return xScale(d[xColumn]); });
+
+        bars.enter().append("text")
+          .text(function(d) { return d3.format(",")(d[xColumn]); })
+          .attr("x", function(d) { return xScale(d.counts) - 10; })
+          .attr("y", function(d) { return yScale(d[yColumn]) +
+                                          yScale.rangeBand() / 2; })
+          .attr("dy", "0.35em");
+
+        bars.exit().remove();
+      }
+
+      function type(d){
+        d.counts = +d.counts;
+        return d;
+      }
+
+      d3.csv("processed-data/year_tree_counts.csv", type, render);
+
+    </script>
+  </body>
+</html>
