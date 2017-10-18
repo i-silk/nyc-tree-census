@@ -1,6 +1,6 @@
-<!code adapted from
+<!-- code adapted from
 http://curran.github.io/screencasts/introToD3/examples/viewer/#/104 and
-https://bl.ocks.org/mbostock/7322386>
+https://bl.ocks.org/mbostock/7322386 -->
 
 <!DOCTYPE html>
 <html>
@@ -9,16 +9,19 @@ https://bl.ocks.org/mbostock/7322386>
     <title>Alive Tree Counts</title>
     <script src="//d3js.org/d3.v3.min.js"></script>
     <style>
-      .textbox text {
-        text-anchor: left;
+      .title {
+        font: 14.5pt sans-serif;
+        font-weight: bold;
       }
 
-      .title.textbox {
-        font: 16pt sans-serif;
+      .subtitle {
+        font: 11pt sans-serif;
+        opacity: 0.65;
       }
 
-      .desc.textbox {
-        font: 12pt sans-serif;
+      .notebar text {
+        fill: silver;
+        font: 11pt sans-serif;
       }
 
       .chart rect {
@@ -31,6 +34,7 @@ https://bl.ocks.org/mbostock/7322386>
       }
 
       .axis text {
+        fill: gray;
         font: 14pt sans-serif;
       }
       .axis path, .axis line {
@@ -49,7 +53,9 @@ https://bl.ocks.org/mbostock/7322386>
 
       var outerWidth = 500;
       var outerHeight = 250;
-      var margin = { left: 50, top: 50, right: 0, bottom: 0 };
+      var titleY = 20;
+      var subtitleY = 41;
+      var margin = { left: 50, top: 60, right: 0, bottom: 25 };
       var barPadding = 0.2;
 
       var xColumn = "counts";
@@ -62,29 +68,34 @@ https://bl.ocks.org/mbostock/7322386>
         .attr("width",  outerWidth)
         .attr("height", outerHeight);
 
-      var textBox = svg.append("g")
-        .attr("class", "textbox");
-      var title = textBox.append("text")
-        .attr("class", "title textbox")
-        .attr("x", 0 )
-        .attr("y", 20)
-        .text("Title of Diagram");
-      var description = textBox.append("text")
-        .attr("class", "desc textbox")
-        .attr("y", 40)
-        .text("Blah")
+      var titlesBox = svg.append("g")
+      var title = titlesBox.append("text")
+        .attr("class", "title")
+        .attr("y", titleY)
+        .text("New York City's streets are becoming greener");
+      var description = titlesBox.append("text")
+        .attr("class", "subtitle")
+        .attr("y", subtitleY)
+        .text("More than 170,000 trees were planted in NYC between \
+               1995 and 2015.");
+
+      var noteBar = svg.append("g")
+        .attr("class", "notebar");
+      var note = noteBar.append("text")
+        .attr("y", outerHeight - 3)
+        .text("Note: Stumps and dead trees were excluded from the count.");
 
       var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       var chart = g.append("g")
-        .attr("class", "chart")
+        .attr("class", "chart");
       var yAxisG = g.append("g")
         .attr("class", "y axis");
 
       var xScale = d3.scale.linear().range([0, innerWidth]);
       var yScale = d3.scale.ordinal().rangeBands([0, innerHeight], barPadding);
 
-      var yAxis = d3.svg.axis().scale(yScale).orient("left")
+      var yAxis = d3.svg.axis().scale(yScale).orient("left");
 
       function render(data){
 
