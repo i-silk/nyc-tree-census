@@ -108,7 +108,6 @@ https://bl.ocks.org/mbostock/7322386 -->
 
         bars.enter().append("rect")
           .attr("height", yScale.rangeBand())
-          .attr("x", 0)
           .attr("y", function(d) { return yScale(d[yColumn]); })
           .attr("width", function(d) { return xScale(d[xColumn]); });
 
@@ -128,6 +127,7 @@ https://bl.ocks.org/mbostock/7322386 -->
       }
 
       d3.csv("processed-data/year_tree_counts.csv", type, render);
+
 
     </script>
   </body>

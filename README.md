@@ -12,7 +12,8 @@ The analysis examines changes in tree numbers and neighborhood tree densities fo
 ### Methodology
 Examine dead trees and alive trees separately.
 
-Exclude trees from zip codes that are not part of New York City such as Mt. Vernon.
+Exclude all trees from zip codes that are not part of New York City such as Mt. Vernon.
+
 The land areas of [10 biggest parks](https://www.nycgovparks.org/about/faq) in NYC are subtracted from the land area of the boroughs, as well as the areas of LaGuardia and JFK airports.
 
 The areas of the zip codes are not adjusted in any way. The 1995 (2005) dataset has 20,933 (8735) alive trees in zip code 0 and 896 (176) dead trees in zip code 0. Those trees were excluded from all visualizations that use zip code information.
@@ -24,3 +25,5 @@ There are 9300 unknown alive trees in 1995, 17,505 unknown alive trees in 2005, 
 For 2015 dataset, "Sophora" species name is changed to Japanese Pagoda Tree, since there are no Sophoras in the earlier years, and Sophora Japonica is Japanese Pagoda Tree.
 
 The tree species in the most popular tree visualization were selected by getting the top 15 trees for the three datasets and taking their union.
+
+The geo json files used in the map visualizations were downloaded from  nyc data: [for borough](http://nycdata.pediacities.com/dataset/nyc-borough-boundaries) boundaries and [for zip code](http://nycdata.pediacities.com/dataset/nyc-zip-code-tabulation-areas) boundaries.

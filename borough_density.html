@@ -1,0 +1,137 @@
+<!-- Code adapted from http://bl.ocks.org/phil-pedruco/6646844
+json file downloaded from
+http://nycdata.pediacities.com/dataset/nyc-borough-boundaries -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title Borough Densities></title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <style>
+      #boroughs {
+        stroke: gray;
+      	stroke-width: 2px;
+        fill: white;
+      }
+
+      .title {
+        font: 14.5pt sans-serif;
+        font-weight: bold;
+        text-anchor: middle;
+      }
+
+      .subtitle {
+        font: 11pt sans-serif;
+        opacity: 0.65;
+        text-anchor: middle;
+      }
+
+      .notebar text {
+        fill: silver;
+        font: 11pt sans-serif;
+        text-anchor: middle;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+
+      var outerWidth = 500;
+      var outerHeight = 460;
+      var titleY = 20;
+      var subtitleY = 40;
+      var noteY = 45;
+      var margin = { left: 0, top: 100, right: 0, bottom: 100 };
+
+      var innerWidth  = outerWidth  - margin.left - margin.right;
+      var innerHeight = outerHeight - margin.top  - margin.bottom;
+
+      var mapScale = innerHeight * 135;
+
+      var svg = d3.select("body").append("svg")
+          .attr("width", outerWidth)
+          .attr("height", outerHeight);
+
+      var titlesBox = svg.append("g")
+      var title = titlesBox.append("text")
+        .attr("class", "title")
+        .attr("y", titleY)
+        .attr("x", outerWidth / 2)
+        .text("Street Tree Densities per Borough");
+      var description = titlesBox.append("text")
+        .attr("class", "subtitle")
+        .attr("y", subtitleY)
+        .attr("x", outerWidth / 2)
+        .text("Queens has given up the 'Greenest Streets' title to Manhattan.");
+
+      var noteBar = svg.append("g")
+        .attr("class", "notebar");
+      var note = noteBar.append("text")
+        .attr("y", outerHeight - noteY)
+        .attr("dy", 0.5)
+        .attr("x", outerWidth / 2)
+        .text("Methodology: The land areas of 10 biggest parks as well as the \
+               areas of LaGuardia and JFK airports were subtracted from the \
+               land areas of the boroughs, since only street treets were counted.")
+        .call(wrap, innerWidth);
+
+      var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      function wrap(text, width) {
+        text.each(function() {
+          var text = d3.select(this),
+              words = text.text().split(/\s+/).reverse(),
+              word,
+              line = [],
+              lineNumber = 0,
+              lineHeight = 1.1, // ems
+              y = text.attr("y"),
+              x = text.attr("x"),
+              dy = parseFloat(text.attr("dy")),
+              tspan = text.text(null).append("tspan")
+                                     .attr("x", x)
+                                     .attr("y", y).attr("dy", dy + "em");
+          while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+              line.pop();
+              tspan.text(line.join(" "));
+              line = [word];
+              tspan = text.append("tspan")
+                          .attr("x", x).attr("y", y)
+                          .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                          .text(word);
+            }
+          }
+        });
+      }
+
+      function draw_map(data) {
+
+        var projection = d3.geo.mercator()
+  				.center([-73.94, 40.70])
+  				.scale(mapScale)
+  				.translate([(innerWidth) / 2, (innerHeight)/2]);
+
+      	var path = d3.geo.path()
+      			.projection(projection);
+
+      	g.append("g")
+      		.attr("id", "boroughs")
+      		.selectAll(".state")
+      		.data(data.features)
+      		.enter().append("path")
+      		.attr("class", function(d){ return d.properties.name; })
+      		.attr("d", path);
+
+      }
+
+      d3.json("boroughs.json", draw_map);
+
+    </script>
+  </body>
+</html>
