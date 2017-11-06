@@ -37,19 +37,19 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
       }
 
       .legend {
-        font-size: 12px;
+        font-size: 10pt;
       }
 
       div.tooltip {
         position: absolute;
         text-align: center;
-        font-size: 9pt;
+        font-size: 10pt;
         width: 150px;
         height: 30px;
         padding: 3px;
         background: #f2f7ef;
         border-radius: 3px;
-        opacity: 0.0;
+        pointer-events: none;
       }
 
     </style>
@@ -81,7 +81,8 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
                 '#41ab5d', '#238443', '#006837', '#004529']);
 
       var div = d3.select("body").append("div")
-        .attr("class", "tooltip");
+        .attr("class", "tooltip")
+        .style("opacity", 0.0);
 
       var svg = d3.select("body").append("svg")
           .attr("width", outerWidth)
@@ -93,7 +94,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
       var projection = d3.geo.mercator()
 				.center([-73.94, 40.70])
 				.scale(mapScale)
-				.translate([(innerWidth) / 2, (innerHeight)/2]);
+				.translate([innerWidth/2, innerHeight/2]);
 
     	var path = d3.geo.path()
     			.projection(projection);
@@ -129,18 +130,22 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         //Adding mouse events
         .on("mouseover", function(d) {
           d3.select(this).style("fill", "#80cdc1");
-          div.style("opacity", 1.0);
-          div.text(name[d.properties.borough] + ": " +
-                   d3.format(",")(count[d.properties.borough]) + " trees; " +
-                   density[d.properties.borough] + " trees per square mile")
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY -30) + "px");
+          div.transition()
+             .duration(200)
+             .style("opacity", 1.0);
+          div.html("<b>" + name[d.properties.borough] + ": " +
+                   density[d.properties.borough] + "</b> trees per sq mi; " +
+                   d3.format(",")(count[d.properties.borough]) + " trees")
+             .style("left", (d3.event.pageX) + "px")
+             .style("top", (d3.event.pageY -30) + "px");
         })
         .on("mouseout", function(d) {
           d3.select(this).style("fill", function(d) {
             return color(density[d.properties.borough]);
           })
-          div.style("opacity", 0.0);
+          div.transition()
+             .duration(200)
+             .style("opacity", 0.0);
         })
 
       }; //<---- End of map drawing
