@@ -19,31 +19,31 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
       }
 
       .title {
-        font: 14.5pt sans-serif;
+        font: 20px sans-serif;
         font-weight: bold;
         text-anchor: middle;
       }
 
       .subtitle {
-        font: 11pt sans-serif;
+        font: 15px sans-serif;
         opacity: 0.65;
         text-anchor: middle;
       }
 
       .notebar text {
         fill: silver;
-        font: 10pt sans-serif;
+        font: 14px sans-serif;
         text-anchor: middle;
       }
 
       .legend {
-        font-size: 10pt;
+        font-size: 12px;
       }
 
       div.tooltip {
         position: absolute;
         text-align: center;
-        font-size: 10pt;
+        font-size: 13px;
         width: 150px;
         height: 30px;
         padding: 3px;
@@ -70,14 +70,14 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
 
       var mapScale = innerHeight * 130;
 
-      var color_domain = [1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800,
+      var color_domain = [1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800,
                           3000]
-      var legend_labels = ["1400", "1600", "1800", "2000", "2200",
-                           "2400" , "2600", "2800"]
+      var legend_labels = ["1400", "1600", "1800", "2000", "2200", "2400" ,
+                           "2600", "2800"]
 
       var color = d3.scale.threshold()
         .domain(color_domain)
-        .range(['#f9f9ea', '#ffffe5', '#f7fcb9', '#d9f0a3', '#addd8e', '#78c679',
+        .range(['#ffffe5', '#f7fcb9', '#d9f0a3', '#addd8e', '#78c679',
                 '#41ab5d', '#238443', '#006837', '#004529']);
 
       var div = d3.select("body").append("div")
@@ -99,13 +99,13 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
     	var path = d3.geo.path()
     			.projection(projection);
 
-      //Reading map file and data
+      // Reading map file and data
       queue()
         .defer(d3.json, "boroughs.json")
         .defer(d3.csv, "processed-data/alive_tree_borough_densities.csv")
         .await(ready);
 
-      //Start of map drawing
+      // Start of map drawing
       function ready(error, map, data) {
         var name = {};
         var count = {};
@@ -117,7 +117,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
           density[d.borough] = +d.density_15;
         });
 
-      	g.append("g")
+        g.append("g")
       		.attr("class", "boroughs")
       		.selectAll(".path")
           .data(map.features)
@@ -127,7 +127,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
             return color(density[d.properties.borough]);
           })
 
-        //Adding mouse events
+        // Adding mouse events
         .on("mouseover", function(d) {
           d3.select(this).style("fill", "#80cdc1");
           div.transition()
@@ -150,6 +150,27 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
 
       }; //<---- End of map drawing
 
+      // Adding legend
+      var legend = svg.selectAll("g.legend")
+        .data(color_domain)
+        .enter().append("g")
+        .attr("class", "legend");
+
+      var ls_w = 20, ls_h = 20;
+
+      legend.append("rect")
+        .attr("x", 20)
+        .attr("y", function(d, i){ return innerHeight - (i*ls_h) - 2*ls_h;})
+        .attr("width", ls_w)
+        .attr("height", ls_h)
+        .style("fill", function(d, i) { return color(d); });
+
+      legend.append("text")
+        .attr("x", 50)
+        .attr("y", function(d, i){ return innerHeight - (i*ls_h) - 1.5 * ls_h - 4;})
+        .text(function(d, i){ return legend_labels[i]; });
+
+      // Adding descriptive text
       var titlesBox = svg.append("g")
       var title = titlesBox.append("text")
         .attr("class", "title")
@@ -160,7 +181,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         .attr("class", "subtitle")
         .attr("y", subtitleY)
         .attr("x", outerWidth / 2)
-        .text("Queens has given up the title of the 'Greenest Streets' to Manhattan.");
+        .text("Manhattan surpasses Queens as the greenest borough");
 
       var noteBar = svg.append("g")
         .attr("class", "notebar");
@@ -170,7 +191,8 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         .attr("x", outerWidth / 2)
         .text("Methodology: The land areas of 10 biggest parks as well as the \
                areas of LaGuardia and JFK airports were subtracted from the \
-               land areas of the boroughs, since only street treets were counted.")
+               land areas of the boroughs, since only street treets were counted \
+               in the census.")
         .call(wrap, innerWidth);
 
       function wrap(text, width) {
