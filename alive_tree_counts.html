@@ -7,7 +7,7 @@ https://bl.ocks.org/mbostock/7322386 -->
   <head>
     <meta charset="utf-8">
     <title>Alive Tree Counts</title>
-    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="//d3js.org/d3.v4.min.js"></script>
     <style>
       .title {
         font: 14.5pt sans-serif;
@@ -92,10 +92,13 @@ https://bl.ocks.org/mbostock/7322386 -->
       var yAxisG = g.append("g")
         .attr("class", "y axis");
 
-      var xScale = d3.scale.linear().range([0, innerWidth]);
-      var yScale = d3.scale.ordinal().rangeBands([0, innerHeight], barPadding);
+      var xScale = d3.scaleLinear()
+                     .range([0, innerWidth]);
+      var yScale = d3.scaleBand()
+                     .rangeRound([0, innerHeight])
+                     .padding(barPadding);
 
-      var yAxis = d3.svg.axis().scale(yScale).orient("left");
+      var yAxis = d3.axisLeft(yScale);
 
       function render(data){
 
@@ -107,7 +110,7 @@ https://bl.ocks.org/mbostock/7322386 -->
         var bars = chart.selectAll("rect").data(data);
 
         bars.enter().append("rect")
-          .attr("height", yScale.rangeBand())
+          .attr("height", yScale.bandwidth())
           .attr("y", function(d) { return yScale(d[yColumn]); })
           .attr("width", function(d) { return xScale(d[xColumn]); });
 
@@ -115,7 +118,7 @@ https://bl.ocks.org/mbostock/7322386 -->
           .text(function(d) { return d3.format(",")(d[xColumn]); })
           .attr("x", function(d) { return xScale(d.counts) - 10; })
           .attr("y", function(d) { return yScale(d[yColumn]) +
-                                          yScale.rangeBand() / 2; })
+                                          yScale.bandwidth() / 2; })
           .attr("dy", "0.35em");
 
         bars.exit().remove();
