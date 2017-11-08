@@ -9,7 +9,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
   <head>
     <meta charset="utf-8">
     <title Borough Densities></title>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="http://d3js.org/queue.v1.min.js"></script>
 
     <style>
@@ -70,12 +70,19 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
 
       var mapScale = innerHeight * 130;
 
-      var color_domain = [1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800,
-                          3000]
+      var leg_w = 20, leg_h = 20;
+
+      var legend_ticks = d3.scaleLinear()
+        .domain([1400, 2800])
+        .rangeRound([leg_h * 8, leg_h]);
+
+      var ext_color_domain = [1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600,
+                              2800]
+      var color_domain = [1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800]
       var legend_labels = ["1400", "1600", "1800", "2000", "2200", "2400" ,
                            "2600", "2800"]
 
-      var color = d3.scale.threshold()
+      var color = d3.scaleThreshold()
         .domain(color_domain)
         .range(['#ffffe5', '#f7fcb9', '#d9f0a3', '#addd8e', '#78c679',
                 '#41ab5d', '#238443', '#006837', '#004529']);
@@ -91,12 +98,12 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
       var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var projection = d3.geo.mercator()
+      var projection = d3.geoMercator()
 				.center([-73.94, 40.70])
 				.scale(mapScale)
 				.translate([innerWidth/2, innerHeight/2]);
 
-    	var path = d3.geo.path()
+    	var path = d3.geoPath()
     			.projection(projection);
 
       // Reading map file and data
@@ -152,23 +159,25 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
 
       // Adding legend
       var legend = svg.selectAll("g.legend")
-        .data(color_domain)
+        .data(ext_color_domain)
         .enter().append("g")
         .attr("class", "legend");
 
-      var ls_w = 20, ls_h = 20;
-
       legend.append("rect")
         .attr("x", 20)
-        .attr("y", function(d, i){ return innerHeight - (i*ls_h) - 2*ls_h;})
-        .attr("width", ls_w)
-        .attr("height", ls_h)
-        .style("fill", function(d, i) { return color(d); });
+        .attr("y", function(d, i){ return innerHeight - (i*leg_h) - 2*leg_h;})
+        .attr("width", leg_w)
+        .attr("height", leg_h)
+        .style("fill", function(d) { return color(d); });
 
-      legend.append("text")
-        .attr("x", 50)
-        .attr("y", function(d, i){ return innerHeight - (i*ls_h) - 1.5 * ls_h - 4;})
-        .text(function(d, i){ return legend_labels[i]; });
+      g.append("g")
+        .attr("transform", "translate(35, 0)")
+        .call(d3.axisRight(legend_ticks)
+        .tickSize(13)
+        .tickFormat(function(legend_ticks, i) { return i ? legend_ticks : legend_ticks; })
+        .tickValues(color.domain()))
+      .select(".domain")
+        .remove();
 
       // Adding descriptive text
       var titlesBox = svg.append("g")
