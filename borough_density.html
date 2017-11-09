@@ -36,8 +36,17 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         text-anchor: middle;
       }
 
-      .legend {
+      .legend text {
+        font: 13px sans-serif;
+        fill: gray;
+      }
+
+      .ticks text {
+        fill: darkgray;
         font-size: 12px;
+      }
+      .ticks line {
+        stroke: lightgray;
       }
 
       div.tooltip {
@@ -58,11 +67,10 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
   <body>
     <script>
 
+      // set position/color variables
       var outerWidth = 550;
       var outerHeight = 500;
-      var titleY = 20;
-      var subtitleY = 43;
-      var noteY = 45;
+
       var margin = { left: 0, top: 100, right: 0, bottom: 100 };
 
       var innerWidth  = outerWidth  - margin.left - margin.right;
@@ -70,23 +78,28 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
 
       var mapScale = innerHeight * 130;
 
+      var ext_color_domain = [1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600,
+                              2800]
+      var color_domain = [1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800]
+
+      var color = d3.scaleThreshold()
+      .domain(color_domain)
+      .range(['#ffffe5', '#f7fcb9', '#d9f0a3', '#addd8e', '#78c679',
+              '#41ab5d', '#238443', '#006837', '#004529']);
+
       var leg_w = 20, leg_h = 20;
+      var legend_x = innerWidth - 20;
+      var legend_y = innerHeight - 8 * leg_h + 20;
 
       var legend_ticks = d3.scaleLinear()
         .domain([1400, 2800])
         .rangeRound([leg_h * 8, leg_h]);
 
-      var ext_color_domain = [1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600,
-                              2800]
-      var color_domain = [1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800]
-      var legend_labels = ["1400", "1600", "1800", "2000", "2200", "2400" ,
-                           "2600", "2800"]
+      var titleY = 20;
+      var subtitleY = 43;
+      var noteY = 45;
 
-      var color = d3.scaleThreshold()
-        .domain(color_domain)
-        .range(['#ffffe5', '#f7fcb9', '#d9f0a3', '#addd8e', '#78c679',
-                '#41ab5d', '#238443', '#006837', '#004529']);
-
+      // set object variables
       var div = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0.0);
@@ -164,16 +177,26 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         .attr("class", "legend");
 
       legend.append("rect")
-        .attr("x", 20)
-        .attr("y", function(d, i){ return innerHeight - (i*leg_h) - 2*leg_h;})
+        .attr("x", legend_x)
+        .attr("y", function(d, i){ return legend_y + 8*leg_h - i*leg_h;})
         .attr("width", leg_w)
         .attr("height", leg_h)
         .style("fill", function(d) { return color(d); });
 
-      g.append("g")
-        .attr("transform", "translate(35, 0)")
-        .call(d3.axisRight(legend_ticks)
-        .tickSize(13)
+      legend.append("text")
+        .attr("x", legend_x - 42)
+        .attr("y", legend_y - 25)
+        .text("Trees per");
+      legend.append("text")
+        .attr("x", legend_x - 48)
+        .attr("y", legend_y - 10)
+        .text("square mile");
+
+      svg.append("g")
+        .attr("class", "ticks")
+        .attr("transform", "translate(" + (legend_x + leg_w) + "," + legend_y + ")")
+        .call(d3.axisLeft(legend_ticks)
+        .tickSize(25)
         .tickFormat(function(legend_ticks, i) { return i ? legend_ticks : legend_ticks; })
         .tickValues(color.domain()))
       .select(".domain")
@@ -190,7 +213,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         .attr("class", "subtitle")
         .attr("y", subtitleY)
         .attr("x", outerWidth / 2)
-        .text("Manhattan surpasses Queens as the greenest borough");
+        .text("Manhattan surpassed Queens as the greenest borough");
 
       var noteBar = svg.append("g")
         .attr("class", "notebar");
