@@ -152,12 +152,13 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
           count[d.borough] =  +d.count_15;
           density[d.borough] = +d.density_15;
           if(year == '2005') {
-          count[d.borough] =  +d.count_05;
-          density[d.borough] = +d.density_05;
-          });
+            count[d.borough] =  +d.count_05;
+            density[d.borough] = +d.density_05;
+            };
           if(year == '1995') {
-          count[d.borough] =  +d.count_95;
-          density[d.borough] = +d.density_95;
+            count[d.borough] =  +d.count_95;
+            density[d.borough] = +d.density_95;
+            };
           });
 
         g.append("g")
