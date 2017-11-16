@@ -61,6 +61,20 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         pointer-events: none;
       }
 
+      div.years_buttons {
+        position: fixed;
+        top: 90px;
+        left: 30px;
+      }
+
+      div.years_buttons div {
+        font: 15px sans-serif;
+        background-color: lightgray;
+        border-radius: 3px;
+        padding: 3px;
+        margin: 7px;
+      }
+
     </style>
   </head>
 
@@ -119,6 +133,8 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
     	var path = d3.geoPath()
     			.projection(projection);
 
+      var years = ['1995', '2005', '2015'];
+
       // Reading map file and data
       queue()
         .defer(d3.json, "boroughs.json")
@@ -126,7 +142,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         .await(ready);
 
       // Start of map drawing
-      function ready(error, map, data) {
+      function ready(error, map, data, year) {
         var name = {};
         var count = {};
         var density = {};
@@ -135,7 +151,14 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
           name[d.borough] = d.borough;
           count[d.borough] =  +d.count_15;
           density[d.borough] = +d.density_15;
-        });
+          if(year == '2005') {
+          count[d.borough] =  +d.count_05;
+          density[d.borough] = +d.density_05;
+          });
+          if(year == '1995') {
+          count[d.borough] =  +d.count_95;
+          density[d.borough] = +d.density_95;
+          });
 
         g.append("g")
       		.attr("class", "boroughs")
@@ -167,8 +190,36 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
              .duration(200)
              .style("opacity", 0.0);
         })
-
       }; //<---- End of map drawing
+
+
+      // Adding buttons
+      var buttons = d3.select("body")
+        .append("div")
+        .attr("class", "years_buttons")
+        .selectAll("div")
+        .data(years)
+        .enter()
+        .append("div")
+        .text(function(d) {
+            return d;
+        });
+
+      buttons.on("click", function(d) {
+        d3.select(".years_buttons")
+          .selectAll("div")
+          .style("background", "lightgray")
+          .style("color", "black")
+          .transition()
+          .duration(100);
+
+        d3.select(this)
+          .transition()
+          .duration(100)
+          .style("background", "#80cdc1")
+          .style("color", "white");
+        update(data);
+      });
 
       // Adding legend
       var legend = svg.selectAll("g.legend")
