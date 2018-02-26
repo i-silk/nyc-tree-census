@@ -1,0 +1,169 @@
+<!-- Author: Inga Silkworth-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title Borough Densities></title>
+    <!-- <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script> -->
+    <script type="text/javascript" src="../d3.js"></script>
+
+    <style>
+
+      .title {
+        font: 20px sans-serif;
+        font-weight: bold;
+        text-anchor: middle;
+      }
+
+      .subtitle {
+        font: 15px sans-serif;
+        opacity: 0.65;
+        text-anchor: middle;
+      }
+
+      .notebar text {
+        fill: silver;
+        font: 14px sans-serif;
+        text-anchor: middle;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <script>
+
+      // set position/color variables
+      var outerWidth = 600;
+      var outerHeight = 400;
+      var padding = 150;
+
+      var margin = { left: 0, top: 100, right: 0, bottom: 100 };
+
+      var innerWidth  = outerWidth  - margin.left - margin.right;
+      var innerHeight = outerHeight - margin.top  - margin.bottom;
+
+      var titleY = 20;
+      var subtitleY = 43;
+      var noteY = 45;
+
+      var dataset, xScale, yScale;  //Empty, for now
+
+      var years = ['1995', '2005', '2015'];
+
+      var csv_file = "processed-data/alive_tree_borough_densities.csv";
+
+      var svg = d3.select("body").append("svg")
+          .attr("width", outerWidth)
+          .attr("height", outerHeight);
+
+      var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      d3.csv(csv_file, function(data) {
+
+        //Create global data array
+				dataset = [];
+        for (var row = 0; row < data.length; row++){
+          for (var y = 0; y < years.length; y++) {
+            if (years[y] == '1995') {
+              dataset.push([data[row].borough, years[y], +data[row].density_95,
+                +data[row].count_95]);
+            } else if (years[y] == '2005') {
+              dataset.push([data[row].borough, years[y], +data[row].density_05,
+                +data[row].count_05]);
+            } else {
+              dataset.push([data[row].borough, years[y], +data[row].density_15,
+                +data[row].count_15]);
+            };;
+          };
+        };
+
+        //Discover start and end dates in dataset
+				var minDensity = d3.min(dataset, function(d) { return d[2]; });
+        var maxDensity = d3.max(dataset, function(d) { return d[2]; });
+
+        var xScale = d3.scaleOrdinal()
+          .domain(years)
+          .range([0 + padding, innerWidth/2, innerWidth - padding]);
+
+        var yScale = d3.scaleLinear()
+          .domain([minDensity, maxDensity])
+          .range([innerHeight, 0]);
+
+        // Generate circles
+        g.selectAll("circle")
+          .data(dataset)
+          .enter()
+          .append("circle")
+          .attr("cx", function(d) {
+            return xScale(d[1])
+          })
+          .attr("cy", function(d) {
+            return yScale(d[2]);
+          })
+          .attr("r", 5)
+          .style("fill", "#80cdc1");
+
+      }); // End csv
+
+
+      // Adding descriptive text
+      var titlesBox = svg.append("g")
+      var title = titlesBox.append("text")
+        .attr("class", "title")
+        .attr("y", titleY)
+        .attr("x", outerWidth / 2)
+        .text("Street Tree Densities per Borough");
+      var description = titlesBox.append("text")
+        .attr("class", "subtitle")
+        .attr("y", subtitleY)
+        .attr("x", outerWidth / 2)
+        .text("Manhattan surpassed Queens as the borough with the greenest trees");
+
+      var noteBar = svg.append("g")
+        .attr("class", "notebar");
+      var note = noteBar.append("text")
+        .attr("y", outerHeight - noteY)
+        .attr("dy", 0.5)
+        .attr("x", outerWidth / 2)
+        .text("Methodology: The land areas of the 10 biggest parks as well as the \
+               areas of LaGuardia and JFK airports were subtracted from the \
+               land areas of the boroughs, since only street treets were counted \
+               in the census.")
+        .call(wrap, innerWidth);
+
+      function wrap(text, width) {
+        text.each(function() {
+          var text = d3.select(this),
+              words = text.text().split(/\s+/).reverse(),
+              word,
+              line = [],
+              lineNumber = 0,
+              lineHeight = 1.1, // ems
+              y = text.attr("y"),
+              x = text.attr("x"),
+              dy = parseFloat(text.attr("dy")),
+              tspan = text.text(null).append("tspan")
+                                     .attr("x", x)
+                                     .attr("y", y).attr("dy", dy + "em");
+          while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+              line.pop();
+              tspan.text(line.join(" "));
+              line = [word];
+              tspan = text.append("tspan")
+                          .attr("x", x).attr("y", y)
+                          .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                          .text(word);
+            }
+          }
+        });
+      }
+
+    </script>
+  </body>
+</html>

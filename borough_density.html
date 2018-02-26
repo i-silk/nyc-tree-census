@@ -9,8 +9,8 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
   <head>
     <meta charset="utf-8">
     <title Borough Densities></title>
-    <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="http://d3js.org/queue.v1.min.js"></script>
+    <!-- <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script> -->
+    <script type="text/javascript" src="../d3.js"></script>
 
     <style>
       .boroughs {
@@ -135,14 +135,9 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
 
       var years = ['1995', '2005', '2015'];
 
-      // Reading map file and data
-      queue()
-        .defer(d3.json, "boroughs.json")
-        .defer(d3.csv, "processed-data/alive_tree_borough_densities.csv")
-        .await(ready);
+      var csv_file = "processed-data/alive_tree_borough_densities.csv";
 
-      // Start of map drawing
-      function ready(error, map, data, year) {
+      d3.csv(csv_file, function(data) {
         var name = {};
         var count = {};
         var density = {};
@@ -151,47 +146,41 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
           name[d.borough] = d.borough;
           count[d.borough] =  +d.count_15;
           density[d.borough] = +d.density_15;
-          if(year == '2005') {
-            count[d.borough] =  +d.count_05;
-            density[d.borough] = +d.density_05;
-            };
-          if(year == '1995') {
-            count[d.borough] =  +d.count_95;
-            density[d.borough] = +d.density_95;
-            };
           });
 
-        g.append("g")
-      		.attr("class", "boroughs")
-      		.selectAll(".path")
-          .data(map.features)
-      		.enter().append("path")
-      		.attr("d", path)
-          .style("fill", function(d) {
-            return color(density[d.properties.borough]);
-          })
+        d3.json("boroughs.json", function(map) {
+          g.append("g")
+        		.attr("class", "boroughs")
+        		.selectAll("path")
+            .data(map.features)
+        		.enter().append("path")
+        		.attr("d", path)
+            .style("fill", function(d) {
+              return color(density[d.properties.borough]);
+            })
 
-        // Adding mouse events
-        .on("mouseover", function(d) {
-          d3.select(this).style("fill", "#80cdc1");
-          div.transition()
-             .duration(200)
-             .style("opacity", 1.0);
-          div.html("<b>" + name[d.properties.borough] + ": " +
-                   density[d.properties.borough] + "</b> trees per sq mi; " +
-                   d3.format(",")(count[d.properties.borough]) + " trees")
-             .style("left", (d3.event.pageX) + "px")
-             .style("top", (d3.event.pageY -30) + "px");
-        })
-        .on("mouseout", function(d) {
-          d3.select(this).style("fill", function(d) {
-            return color(density[d.properties.borough]);
+          // Adding mouse events
+          .on("mouseover", function(d) {
+            d3.select(this).style("fill", "#80cdc1");
+            div.transition()
+               .duration(200)
+               .style("opacity", 1.0);
+            div.html("<b>" + name[d.properties.borough] + ": " +
+                     density[d.properties.borough] + "</b> trees per sq mi; " +
+                     d3.format(",")(count[d.properties.borough]) + " trees")
+               .style("left", (d3.event.pageX) + "px")
+               .style("top", (d3.event.pageY -30) + "px");
           })
-          div.transition()
-             .duration(200)
-             .style("opacity", 0.0);
-        })
-      }; //<---- End of map drawing
+          .on("mouseout", function(d) {
+            d3.select(this).style("fill", function(d) {
+              return color(density[d.properties.borough]);
+            })
+            div.transition()
+               .duration(200)
+               .style("opacity", 0.0);
+          })
+        }) // End json
+      }); // End csv
 
 
       // Adding buttons
@@ -204,6 +193,16 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         .append("div")
         .text(function(d) {
             return d;
+        })
+        .style("color", function(d) {
+          if (d == '2015') {
+            return 'white';
+          }
+        })
+        .style("background", function(d) {
+          if (d == '2015') {
+            return '#80cdc1';
+          }
         });
 
       buttons.on("click", function(d) {
@@ -219,8 +218,59 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
           .duration(100)
           .style("background", "#80cdc1")
           .style("color", "white");
-        update(data);
+        update(d);
       });
+
+      function update(year) {
+        d3.csv(csv_file, function (data) {
+          var name = {};
+          var count = {};
+          var density = {};
+
+          data.forEach(function(d) {
+            name[d.borough] = d.borough;
+            if (year == '2015') {
+              count[d.borough] =  +d.count_15;
+              density[d.borough] = +d.density_15;
+            } else if (year == '2005') {
+              count[d.borough] =  +d.count_05;
+              density[d.borough] = +d.density_05;
+            } else if (year == '1995') {
+              count[d.borough] =  +d.count_95;
+              density[d.borough] = +d.density_95;
+            };
+          });
+
+          // update fill colors
+          d3.selectAll('path')
+            .style("fill", function(d) {
+              return color(density[d.properties.borough]);
+            })
+
+            // Adding mouse events
+            .on("mouseover", function(d) {
+              d3.select(this).style("fill", "#80cdc1");
+              div.transition()
+                 .duration(200)
+                 .style("opacity", 1.0);
+              div.html("<b>" + name[d.properties.borough] + ": " +
+                       density[d.properties.borough] + "</b> trees per sq mi; " +
+                       d3.format(",")(count[d.properties.borough]) + " trees")
+                 .style("left", (d3.event.pageX) + "px")
+                 .style("top", (d3.event.pageY -30) + "px");
+            })
+            .on("mouseout", function(d) {
+              d3.select(this).style("fill", function(d) {
+                return color(density[d.properties.borough]);
+              })
+              div.transition()
+                 .duration(200)
+                 .style("opacity", 0.0);
+            })   // End mouse events
+
+        });
+      };  // End update function
+
 
       // Adding legend
       var legend = svg.selectAll("g.legend")
@@ -265,7 +315,7 @@ http://nycdata.pediacities.com/dataset/nyc-borough-boundaries-->
         .attr("class", "subtitle")
         .attr("y", subtitleY)
         .attr("x", outerWidth / 2)
-        .text("Manhattan surpassed Queens as the greenest borough");
+        .text("Manhattan surpassed Queens as the greenest borough in 2015");
 
       var noteBar = svg.append("g")
         .attr("class", "notebar");
