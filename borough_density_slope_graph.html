@@ -10,6 +10,24 @@
 
     <style>
 
+      .slope_line {
+        fill: none;
+        stroke: gray;
+        stroke-width: 1.5px;
+      }
+
+      .circles {
+        fill: #80cdc1;
+      }
+
+      .text {
+        fill: gray;
+        font: 14px sans-serif;
+      }
+      .text.left {
+        text-anchor: end;
+      }
+
       .title {
         font: 20px sans-serif;
         font-weight: bold;
@@ -37,7 +55,7 @@
       // set position/color variables
       var outerWidth = 600;
       var outerHeight = 400;
-      var padding = 150;
+      var padding = 160;
 
       var margin = { left: 0, top: 100, right: 0, bottom: 100 };
 
@@ -52,7 +70,7 @@
 
       var years = ['1995', '2005', '2015'];
 
-      var csv_file = "processed-data/alive_tree_borough_densities.csv";
+      var csv_file = "processed-data/alive_tree_borough_densities_perstmi.csv";
 
       var svg = d3.select("body").append("svg")
           .attr("width", outerWidth)
@@ -63,9 +81,11 @@
 
       d3.csv(csv_file, function(data) {
 
-        //Create global data array
-				dataset = [];
+        // Create global data array for circles and an array for lines
+				var dataset = [];
+        var densities = [];
         for (var row = 0; row < data.length; row++){
+          densities.push([+data[row].density_95, +data[row].density_05, +data[row].density_15]);
           for (var y = 0; y < years.length; y++) {
             if (years[y] == '1995') {
               dataset.push([data[row].borough, years[y], +data[row].density_95,
@@ -80,7 +100,7 @@
           };
         };
 
-        //Discover start and end dates in dataset
+        // Discover start and end dates in dataset
 				var minDensity = d3.min(dataset, function(d) { return d[2]; });
         var maxDensity = d3.max(dataset, function(d) { return d[2]; });
 
@@ -92,19 +112,72 @@
           .domain([minDensity, maxDensity])
           .range([innerHeight, 0]);
 
+        //Define line generator
+        var line = d3.line()
+          .x(function(d, i) { return xScale(years[i]); })
+          .y(function(d) { return yScale(d); });
+
+        // Generate lines
+        g.selectAll("line")
+          .data(densities)
+          .enter()
+          .append("path")
+          .attr("class", "slope_line")
+          .attr("d", line);
+
         // Generate circles
-        g.selectAll("circle")
+        circles = g.selectAll("circle")
           .data(dataset)
           .enter()
           .append("circle")
+          .attr("class", "circles")
           .attr("cx", function(d) {
-            return xScale(d[1])
+            return xScale(d[1]);
           })
           .attr("cy", function(d) {
             return yScale(d[2]);
           })
-          .attr("r", 5)
-          .style("fill", "#80cdc1");
+          .attr("r", 5);
+
+        // Add labels on the left
+        g.selectAll("text")
+          .data(dataset)
+          .enter()
+          .append("text")
+          .filter(function(d) {
+            return d[1] == "1995";
+          })
+            .text(function(d) {
+              return d[0] + "  " + d[2];
+            })
+            .attr("x", function(d) {
+              return xScale(d[1]) - 10;
+            })
+            .attr("y", function(d) {
+              return yScale(d[2]) + 5;
+            })
+            .attr("class", "text left");
+
+
+        // Add labels on the right
+        g.selectAll("text")
+          .data(dataset)
+          .enter()
+          .append("text")
+          .filter(function(d) {
+            return d[1] == "2015";
+          })
+            .text(function(d) {
+              return d[0] + "  " + d[2];
+            })
+            .attr("x", function(d) {
+              return xScale(d[1]) - 50;
+            })
+            .attr("y", function(d) {
+              return yScale(d[2]) + 5;
+            })
+            .attr("class", "text right");
+
 
       }); // End csv
 
@@ -120,7 +193,7 @@
         .attr("class", "subtitle")
         .attr("y", subtitleY)
         .attr("x", outerWidth / 2)
-        .text("Manhattan surpassed Queens as the borough with the greenest trees");
+        .text("Brooklyn has the least green streets in New York City.");
 
       var noteBar = svg.append("g")
         .attr("class", "notebar");
@@ -128,10 +201,9 @@
         .attr("y", outerHeight - noteY)
         .attr("dy", 0.5)
         .attr("x", outerWidth / 2)
-        .text("Methodology: The land areas of the 10 biggest parks as well as the \
-               areas of LaGuardia and JFK airports were subtracted from the \
-               land areas of the boroughs, since only street treets were counted \
-               in the census.")
+        .text("Methodology: To get street tree densities, tree counts were divided by the \
+               number of street miles in each borough. The number of street miles were found \
+               at fcny.org/cmgp.")
         .call(wrap, innerWidth);
 
       function wrap(text, width) {

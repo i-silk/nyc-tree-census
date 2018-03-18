@@ -14,6 +14,8 @@ Examine dead trees and alive trees separately.
 
 Exclude all trees from zip codes that are not part of New York City such as Mt. Vernon.
 
+Street miles for all the boroughs were found at [fcny.org](http://venus.fcny.org/cmgp/streets/pages/reports.htm). The numbers are from 2001.
+
 The land areas of [10 biggest parks](https://www.nycgovparks.org/about/faq) in NYC are subtracted from the land area of the boroughs, as well as the areas of LaGuardia and JFK airports.
 
 The areas of the zip codes are not adjusted in any way. The 1995 (2005) dataset has 20,933 (8735) alive trees in zip code 0 and 896 (176) dead trees in zip code 0. Those trees were excluded from all visualizations that use zip code information.
