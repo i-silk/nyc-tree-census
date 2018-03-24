@@ -61,8 +61,8 @@
 
       // set position/color variables
       var outerWidth = 600;
-      var outerHeight = 400;
-      var padding_lr = 160;
+      var outerHeight = 700;
+      var padding_lr = 205;
       var padding_tb = 30;
 
       var margin = { left: 0, top: 80, right: 0, bottom: 60 };
@@ -78,7 +78,7 @@
 
       var years = ['1995', '2005', '2015'];
 
-      var csv_file = "processed-data/alive_tree_borough_densities_perstmi.csv";
+      var csv_file = "processed-data/popular_alive_trees.csv";
 
       var svg = d3.select("body").append("svg")
           .attr("width", outerWidth)
@@ -91,33 +91,30 @@
 
         // Create global data array for circles and an array for lines
 				var dataset = [];
-        var densities = [];
-        for (var row = 0; row < data.length; row++){
-          densities.push([+data[row].density_95, +data[row].density_05, +data[row].density_15]);
+        var counts = [];
+        for (var row = 0; row < data.length - 8; row++){
+          counts.push([+data[row].count_95, +data[row].count_05, +data[row].count_15]);
           for (var y = 0; y < years.length; y++) {
             if (years[y] == '1995') {
-              dataset.push([data[row].borough, years[y], +data[row].density_95,
-                +data[row].count_95]);
+              dataset.push([data[row].species, years[y], +data[row].count_95]);
             } else if (years[y] == '2005') {
-              dataset.push([data[row].borough, years[y], +data[row].density_05,
-                +data[row].count_05]);
+              dataset.push([data[row].species, years[y], +data[row].count_05]);
             } else {
-              dataset.push([data[row].borough, years[y], +data[row].density_15,
-                +data[row].count_15]);
+              dataset.push([data[row].species, years[y], +data[row].count_15]);
             };;
           };
         };
 
         // Discover start and end dates in dataset
-				var minDensity = d3.min(dataset, function(d) { return d[2]; });
-        var maxDensity = d3.max(dataset, function(d) { return d[2]; });
+				var minCount = d3.min(dataset, function(d) { return d[2]; });
+        var maxCount = d3.max(dataset, function(d) { return d[2]; });
 
         var xScale = d3.scaleOrdinal()
           .domain(years)
           .range([0 + padding_lr, innerWidth/2, innerWidth - padding_lr]);
 
         var yScale = d3.scaleLinear()
-          .domain([minDensity, maxDensity])
+          .domain([minCount, maxCount])
           .range([innerHeight - padding_tb, 0 + padding_tb]);
 
         //Define line generator
@@ -127,7 +124,7 @@
 
         // Generate lines
         g.selectAll("line")
-          .data(densities)
+          .data(counts)
           .enter()
           .append("path")
           .attr("class", "slope_line")
@@ -158,15 +155,15 @@
           .enter()
           .append("text")
           .text(function(d) {
-            return d[0] + "  " + d[2];
+            return d[0] + "  " + d3.format(",")(d[2]);
           })
           .attr("x", function(d) {
             return xScale(d[1]) - 10;
           })
           .attr("y", function(d) {
-            if (d[0] == "Brooklyn") {
-              return yScale(d[2]) + 1;
-            } else {
+            if (d[0] == 'Callery Pear'){
+              return yScale(d[2]) + 7;
+            }else {
             return yScale(d[2]) + 5;
           }})
           .attr("class", "labels left");
@@ -176,14 +173,21 @@
           .enter()
           .append("text")
           .text(function(d) {
-            return d[2] + "  " + d[0];
+            return d3.format(",")(d[2]) + "  " + d[0];
           })
           .attr("x", function(d) {
             return xScale(d[1]) + 10;
           })
           .attr("y", function(d) {
+            if (d[0] == 'Japanese Pagoda Tree') {
+              return yScale(d[2]) + 10;
+            } else if (d[0] == 'Little Leaf Linden') {
+              return yScale(d[2]) - 5;
+            } else if (d[0] == 'Japanese Zelkova') {
+              return yScale(d[2]) + 17;
+            } else {
             return yScale(d[2]) + 5;
-          })
+          }})
           .attr("class", "labels");
 
         // Add year labels
@@ -209,12 +213,12 @@
         .attr("class", "title")
         .attr("y", titleY)
         .attr("x", outerWidth / 2)
-        .text("Number of Trees per Street Mile for the Five Boroughs");
+        .text("Ten Most Common Trees in New York City");
       var description = titlesBox.append("text")
         .attr("class", "subtitle")
         .attr("y", subtitleY)
         .attr("x", outerWidth / 2)
-        .text("Brooklyn has the least green streets in New York City.");
+        .text("More than 70,000 Norway Maples were eradicated.");
 
       var noteBar = svg.append("g")
         .attr("class", "notebar");
@@ -222,9 +226,7 @@
         .attr("y", outerHeight - noteY)
         .attr("dy", 0.5)
         .attr("x", outerWidth / 2)
-        .text("Methodology: To get street tree densities, tree counts were divided by the \
-               number of street miles in each borough. The number of street miles were found \
-               at fcny.org/cmgp.")
+        .text("Methodology: Species names were cleaned up in each dataset.")
         .call(wrap, innerWidth);
 
       function wrap(text, width) {
