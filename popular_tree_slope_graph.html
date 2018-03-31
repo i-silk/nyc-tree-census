@@ -1,10 +1,10 @@
-<!-- Author: Inga Silkworth-->
+<!-- Author: Inga Silkworth -->
 
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title Borough Densities></title>
+    <title Ten Most Common Trees ></title>
     <!-- <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script> -->
     <script type="text/javascript" src="../d3.js"></script>
 
@@ -128,7 +128,11 @@
           .enter()
           .append("path")
           .attr("class", "slope_line")
-          .attr("d", line);
+          .attr("d", line)
+          .style("stroke", function (d, i) {
+            if (i == 4) {
+              return "orange";
+            }});
 
         // Generate circles
         circles = g.selectAll("circle")
@@ -226,7 +230,10 @@
         .attr("y", outerHeight - noteY)
         .attr("dy", 0.5)
         .attr("x", outerWidth / 2)
-        .text("Methodology: Species names were cleaned up in each dataset.")
+        .text("Methodology: The trees shown in this visualization are the top 10 trees for 2015. \
+               Trees in the top 6 for 1995 and 2005 are present, however, others are not shown \
+               to not clutter the graph. Excluded trees include green ash, red maple, silver maple, \
+               and sugar maple.")
         .call(wrap, innerWidth);
 
       function wrap(text, width) {

@@ -1,0 +1,128 @@
+<!-- Author: Inga Silkworth
+Code adapted from http://bl.ocks.org/chrtze/440f276856cf707963f5 -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title Maps of Dead Trees ></title>
+    <!-- <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script> -->
+    <script type="text/javascript" src="../d3.js"></script>
+    <!-- <script src='http://d3js.org/queue.v3.min.js'></script> -->
+
+    <style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    #vis {
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+    }
+    #vis div {
+        float: left;
+        position: relative;
+    }
+    #vis path {
+        fill: lightgrey;
+        stroke: gray;
+        stroke-width: 1px;
+    }
+    #vis p.legend {
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        left: 0;
+        font-weight: bold;
+        font: 18px sans-serif;
+        opacity: 0.8;
+    }
+    #vis circle {
+      fill: orange;
+      opacity: 0.1;
+    }
+    </style>
+  </head>
+
+  <body>
+    <div id='vis'></div>
+    <script>
+    var Vis = (function(d3) {
+        var geojson;
+        // queue()
+        //     .defer(d3.json, 'boroughs.json')
+        //     .defer(d3.csv, 'processed-data/dead_tree_lat_long.csv')
+        //     .await(visualize);
+        csv_file = 'processed-data/dead_tree_lat_long.csv'
+        json_file = 'boroughs.json'
+
+        d3.csv(csv_file, function(data) {
+          d3.json(json_file, function(states) {
+            data.forEach(function(data, i) {
+                var wrapper = d3.select('#vis')
+                    .append('div')
+                    .style('width', width)
+                    .style('height', height);
+                data['trees'] = JSON.parse(data.trees);
+                createMap(wrapper, states, data);
+            });
+          });
+        });
+
+        var width = 320;
+        var height = 320;
+
+        var projection = d3.geoMercator().center([-73.94, 40.70]).scale(height * 90).translate([width/2, height/2]);
+        var path = d3.geoPath().projection(projection);
+
+        function visualize(error, states, data) {
+
+            data.forEach(function(data, i) {
+                var wrapper = d3.select('#vis')
+                    .append('div')
+                    .style('width', width)
+                    .style('height', height);
+
+                createMap(wrapper, states, data);
+            });
+        }
+
+        function createMap(wrapper, geo, data) {
+
+            wrapper.append('p')
+                .text(data.year)
+                .attr('class', 'legend');
+
+            var svg = wrapper.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            svg.selectAll('path')
+                .data(geo.features)
+                .enter()
+                .append('path')
+                .attr('d', path)
+                .style('opacity', 1.0)
+                .attr('class', 'path');
+
+            // Generate circles
+            circles = svg.selectAll("circle")
+                .data(data.trees)
+                .enter()
+                .append("circle")
+                .attr("class", "circles")
+                .attr("cx", function(d) {
+                  return projection([d[1], d[0]])[0];
+                })
+                .attr("cy", function(d) {
+                  return projection([d[1], d[0]])[1];
+                })
+                .attr("r", 1);
+
+        } // end createMap
+    })(d3);
+    </script>
+  </body>
+</html>
