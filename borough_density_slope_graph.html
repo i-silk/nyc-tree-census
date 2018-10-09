@@ -7,6 +7,7 @@
     <title Number of Trees per Street Mile for the Five Boroughs ></title>
     <!-- <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script> -->
     <script type="text/javascript" src="../d3.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 
     <style>
 
@@ -18,38 +19,36 @@
 
       .circles {
         fill: #80cdc1;
+        stroke: white;
       }
 
       .labels {
         fill: gray;
-        font: 14px sans-serif;
+        font-size: 14px;
+        font-family: 'Poppins';
       }
       .left {
         text-anchor: end;
       }
 
       .years {
-        font: 17px sans-serif;
-        fill: black;
+        font-size: 17px;
+        font-family: 'Poppins';
         font-weight: bold;
-        opacity: 0.6;
+        fill: #636666;
       }
 
       .title {
-        font: 20px sans-serif;
+        font-size: 18px;
+        font-family: 'Poppins';
         font-weight: bold;
         text-anchor: middle;
       }
 
       .subtitle {
-        font: 15px sans-serif;
-        opacity: 0.65;
-        text-anchor: middle;
-      }
-
-      .notebar text {
-        fill: silver;
-        font: 14px sans-serif;
+        font-size: 14px;
+        font-family: 'Poppins';
+        fill: gray;
         text-anchor: middle;
       }
 
@@ -61,18 +60,17 @@
 
       // set position/color variables
       var outerWidth = 600;
-      var outerHeight = 400;
+      var outerHeight = 350;
       var padding_lr = 160;
       var padding_tb = 30;
 
-      var margin = { left: 0, top: 80, right: 0, bottom: 60 };
+      var margin = { left: 0, top: 80, right: 0, bottom: 0 };
 
       var innerWidth  = outerWidth  - margin.left - margin.right;
       var innerHeight = outerHeight - margin.top  - margin.bottom;
 
       var titleY = 20;
       var subtitleY = 43;
-      var noteY = 45;
 
       var dataset, xScale, yScale;  //Empty, for now
 
@@ -215,47 +213,6 @@
         .attr("y", subtitleY)
         .attr("x", outerWidth / 2)
         .text("Brooklyn has the least green streets in New York City.");
-
-      var noteBar = svg.append("g")
-        .attr("class", "notebar");
-      var note = noteBar.append("text")
-        .attr("y", outerHeight - noteY)
-        .attr("dy", 0.5)
-        .attr("x", outerWidth / 2)
-        .text("Methodology: To get street tree densities, tree counts were divided by the \
-               number of street miles in each borough. The number of street miles were found \
-               at fcny.org/cmgp.")
-        .call(wrap, innerWidth);
-
-      function wrap(text, width) {
-        text.each(function() {
-          var text = d3.select(this),
-              words = text.text().split(/\s+/).reverse(),
-              word,
-              line = [],
-              lineNumber = 0,
-              lineHeight = 1.1, // ems
-              y = text.attr("y"),
-              x = text.attr("x"),
-              dy = parseFloat(text.attr("dy")),
-              tspan = text.text(null).append("tspan")
-                                     .attr("x", x)
-                                     .attr("y", y).attr("dy", dy + "em");
-          while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
-              line.pop();
-              tspan.text(line.join(" "));
-              line = [word];
-              tspan = text.append("tspan")
-                          .attr("x", x).attr("y", y)
-                          .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                          .text(word);
-            }
-          }
-        });
-      }
 
     </script>
   </body>

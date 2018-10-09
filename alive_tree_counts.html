@@ -7,21 +7,22 @@ https://bl.ocks.org/mbostock/7322386 -->
   <head>
     <meta charset="utf-8">
     <title>Alive Tree Counts</title>
-    <script src="//d3js.org/d3.v4.min.js"></script>
+    <!-- <script src="//d3js.org/d3.v4.min.js"></script> -->
+    <script type="text/javascript" src="../d3.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
     <style>
       .title {
-        font: 14.5pt sans-serif;
+        font-family: 'Poppins';
+        font-size: 18px;
         font-weight: bold;
+        text-anchor: middle;
       }
 
       .subtitle {
-        font: 11pt sans-serif;
-        opacity: 0.65;
-      }
-
-      .notebar text {
-        fill: silver;
-        font: 11pt sans-serif;
+        font-family: 'Poppins';
+        font-size: 14px;
+        fill: gray;
+        text-anchor: middle;
       }
 
       .chart rect {
@@ -29,13 +30,15 @@ https://bl.ocks.org/mbostock/7322386 -->
       }
       .chart text {
         fill: white;
-        font: 13pt sans-serif;
+        font-family: 'Poppins';
+        font-size: 15px;
         text-anchor: end;
       }
 
       .axis text {
         fill: gray;
-        font: 14pt sans-serif;
+        font-family: 'Poppins';
+        font-size: 16px;
       }
       .axis path, .axis line {
         fill: none;
@@ -52,7 +55,7 @@ https://bl.ocks.org/mbostock/7322386 -->
     <script>
 
       var outerWidth = 500;
-      var outerHeight = 250;
+      var outerHeight = 210;
       var titleY = 20;
       var subtitleY = 41;
       var margin = { left: 50, top: 60, right: 0, bottom: 25 };
@@ -72,18 +75,14 @@ https://bl.ocks.org/mbostock/7322386 -->
       var title = titlesBox.append("text")
         .attr("class", "title")
         .attr("y", titleY)
+        .attr("x", outerWidth / 2)
         .text("New York City's streets are becoming greener");
       var description = titlesBox.append("text")
         .attr("class", "subtitle")
         .attr("y", subtitleY)
+        .attr("x", outerWidth / 2)
         .text("More than 160,000 trees were planted in NYC between \
                1995 and 2015.");
-
-      var noteBar = svg.append("g")
-        .attr("class", "notebar");
-      var note = noteBar.append("text")
-        .attr("y", outerHeight - 3)
-        .text("Note: Stumps and dead trees were excluded from the count.");
 
       var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");

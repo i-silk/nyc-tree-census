@@ -8,25 +8,24 @@ Code adapted from http://bl.ocks.org/chrtze/440f276856cf707963f5 -->
     <title Maps of Dead Trees ></title>
     <!-- <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script> -->
     <script type="text/javascript" src="../d3.js"></script>
-    <!-- <script src='http://d3js.org/queue.v3.min.js'></script> -->
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 
     <style>
     html,
     body {
-        margin: 0;
+        margin: 30;
         padding: 0;
     }
     #vis {
-        width: 100%;
-        max-width: 980px;
-        margin: 0 auto;
+        width: 650;
+        height: 400;
     }
     #vis div {
         float: left;
         position: relative;
     }
     #vis path {
-        fill: lightgrey;
+        fill: #EEEEEE;
         stroke: gray;
         stroke-width: 1px;
     }
@@ -35,13 +34,19 @@ Code adapted from http://bl.ocks.org/chrtze/440f276856cf707963f5 -->
         text-align: center;
         bottom: 0;
         left: 0;
-        font-weight: bold;
-        font: 18px sans-serif;
-        opacity: 0.8;
+        font-size: 17px;
+        fill: #636666;
+        font-family: 'Poppins';
     }
     #vis circle {
-      fill: orange;
+      fill: #EF2875;
       opacity: 0.1;
+    }
+    #vis title {
+      font-size: 20px;
+      font-family: 'Poppins';
+      font-weight: bold;
+      text-anchor: middle;
     }
     </style>
   </head>
@@ -49,80 +54,66 @@ Code adapted from http://bl.ocks.org/chrtze/440f276856cf707963f5 -->
   <body>
     <div id='vis'></div>
     <script>
-    var Vis = (function(d3) {
-        var geojson;
-        // queue()
-        //     .defer(d3.json, 'boroughs.json')
-        //     .defer(d3.csv, 'processed-data/dead_tree_lat_long.csv')
-        //     .await(visualize);
-        csv_file = 'processed-data/dead_tree_lat_long.csv'
-        json_file = 'boroughs.json'
 
-        d3.csv(csv_file, function(data) {
-          d3.json(json_file, function(states) {
-            data.forEach(function(data, i) {
-                var wrapper = d3.select('#vis')
-                    .append('div')
-                    .style('width', width)
-                    .style('height', height);
-                data['trees'] = JSON.parse(data.trees);
-                createMap(wrapper, states, data);
-            });
+      var geojson;
+
+      csv_file = 'processed-data/dead_tree_lat_long.csv'
+      json_file = 'boroughs.json'
+
+      d3.csv(csv_file, function(data) {
+        d3.json(json_file, function(states) {
+          data.forEach(function(data, i) {
+            if (data.year != '2005') {
+              var wrapper = d3.select('#vis')
+                  .append('div')
+                  .style('width', width)
+                  .style('height', height);
+              data['trees'] = JSON.parse(data.trees);
+              createMap(wrapper, states, data);
+            };
           });
         });
+      });
 
-        var width = 320;
-        var height = 320;
+      var width = 320;
+      var height = 320;
 
-        var projection = d3.geoMercator().center([-73.94, 40.70]).scale(height * 90).translate([width/2, height/2]);
-        var path = d3.geoPath().projection(projection);
+      var projection = d3.geoMercator().center([-73.94, 40.70]).scale(height * 90).translate([width/2, height/2]);
+      var path = d3.geoPath().projection(projection);
 
-        function visualize(error, states, data) {
+      function createMap(wrapper, geo, data) {
 
-            data.forEach(function(data, i) {
-                var wrapper = d3.select('#vis')
-                    .append('div')
-                    .style('width', width)
-                    .style('height', height);
+          wrapper.append('p')
+              .text(data.year)
+              .attr('class', 'legend');
 
-                createMap(wrapper, states, data);
-            });
-        }
+          var svg = wrapper.append('svg')
+              .attr('width', width)
+              .attr('height', height);
 
-        function createMap(wrapper, geo, data) {
+          svg.selectAll('path')
+              .data(geo.features)
+              .enter()
+              .append('path')
+              .attr('d', path)
+              .style('opacity', 1.0)
+              .attr('class', 'path');
 
-            wrapper.append('p')
-                .text(data.year)
-                .attr('class', 'legend');
+          // Generate circles
+          circles = svg.selectAll("circle")
+              .data(data.trees)
+              .enter()
+              .append("circle")
+              .attr("class", "circles")
+              .attr("cx", function(d) {
+                return projection([d[1], d[0]])[0];
+              })
+              .attr("cy", function(d) {
+                return projection([d[1], d[0]])[1];
+              })
+              .attr("r", 1);
 
-            var svg = wrapper.append('svg')
-                .attr('width', width)
-                .attr('height', height);
-
-            svg.selectAll('path')
-                .data(geo.features)
-                .enter()
-                .append('path')
-                .attr('d', path)
-                .style('opacity', 1.0)
-                .attr('class', 'path');
-
-            // Generate circles
-            circles = svg.selectAll("circle")
-                .data(data.trees)
-                .enter()
-                .append("circle")
-                .attr("class", "circles")
-                .attr("cx", function(d) {
-                  return projection([d[1], d[0]])[0];
-                })
-                .attr("cy", function(d) {
-                  return projection([d[1], d[0]])[1];
-                })
-                .attr("r", 1);
-
-        } // end createMap
-    })(d3);
+      }; // end createMap
     </script>
   </body>
 </html>

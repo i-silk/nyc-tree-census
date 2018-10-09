@@ -7,6 +7,7 @@
     <title Ten Most Common Trees ></title>
     <!-- <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script> -->
     <script type="text/javascript" src="../d3.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 
     <style>
 
@@ -17,40 +18,38 @@
       }
 
       .circles {
+        stroke: white;
         fill: #80cdc1;
       }
 
       .labels {
         fill: gray;
-        font: 14px sans-serif;
+        font-size: 13px;
+        font-family: 'Poppins';
       }
       .left {
         text-anchor: end;
       }
 
       .years {
-        font: 17px sans-serif;
-        fill: black;
+        font-size: 17px;
+        font-family: 'Poppins';
+        fill: #636666;
         font-weight: bold;
-        opacity: 0.6;
       }
 
       .title {
-        font: 20px sans-serif;
+        font-size: 18px;
+        font-family: 'Poppins';
         font-weight: bold;
         text-anchor: middle;
       }
 
       .subtitle {
-        font: 15px sans-serif;
-        opacity: 0.65;
+        font-size: 14px;
+        font-family: 'Poppins';
         text-anchor: middle;
-      }
-
-      .notebar text {
-        fill: silver;
-        font: 14px sans-serif;
-        text-anchor: middle;
+        fill: gray;
       }
 
     </style>
@@ -61,18 +60,17 @@
 
       // set position/color variables
       var outerWidth = 600;
-      var outerHeight = 700;
+      var outerHeight = 680;
       var padding_lr = 205;
       var padding_tb = 30;
 
-      var margin = { left: 0, top: 80, right: 0, bottom: 60 };
+      var margin = { left: 0, top: 80, right: 0, bottom: 0 };
 
       var innerWidth  = outerWidth  - margin.left - margin.right;
       var innerHeight = outerHeight - margin.top  - margin.bottom;
 
       var titleY = 20;
       var subtitleY = 43;
-      var noteY = 45;
 
       var dataset, xScale, yScale;  //Empty, for now
 
@@ -222,49 +220,7 @@
         .attr("class", "subtitle")
         .attr("y", subtitleY)
         .attr("x", outerWidth / 2)
-        .text("More than 70,000 Norway Maples were eradicated.");
-
-      var noteBar = svg.append("g")
-        .attr("class", "notebar");
-      var note = noteBar.append("text")
-        .attr("y", outerHeight - noteY)
-        .attr("dy", 0.5)
-        .attr("x", outerWidth / 2)
-        .text("Methodology: The trees shown in this visualization are the top 10 trees for 2015. \
-               Trees in the top 6 for 1995 and 2005 are present, however, others are not shown \
-               to not clutter the graph. Excluded trees include green ash, red maple, silver maple, \
-               and sugar maple.")
-        .call(wrap, innerWidth);
-
-      function wrap(text, width) {
-        text.each(function() {
-          var text = d3.select(this),
-              words = text.text().split(/\s+/).reverse(),
-              word,
-              line = [],
-              lineNumber = 0,
-              lineHeight = 1.1, // ems
-              y = text.attr("y"),
-              x = text.attr("x"),
-              dy = parseFloat(text.attr("dy")),
-              tspan = text.text(null).append("tspan")
-                                     .attr("x", x)
-                                     .attr("y", y).attr("dy", dy + "em");
-          while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
-              line.pop();
-              tspan.text(line.join(" "));
-              line = [word];
-              tspan = text.append("tspan")
-                          .attr("x", x).attr("y", y)
-                          .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                          .text(word);
-            }
-          }
-        });
-      }
+        .text("More than 70,000 Norway Maples have disappeared from the streets.");
 
     </script>
   </body>
